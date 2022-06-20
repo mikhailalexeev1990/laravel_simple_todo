@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+    nginx:
+        image: nginx:alpine
+        restart: unless-stopped
+        ports:
+            - 81:80
+        depends_on:
+            - app
+        volumes:
+            - ./:/var/www/app
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+
+    app:
+        build:
+            context: ./
+            dockerfile: ./docker/php/Dockerfile
+            target: app
+        entrypoint: [ "/bin/sh","-c" ]
+        #        command: [ "composer install && php-fpm" ]
+        command: [ "php-fpm" ]
+        depends_on:
+            - database
+        volumes:
+            - ./:/var/www/app
+
+    database:
+        image: mysql:8.0
+        platform: linux/x86_64
+        restart: unless-stopped
+        ports:
+            - 33065:3306
+        environment:
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - database_data:/var/lib/mysql/
+
+volumes:
+    database_data:
