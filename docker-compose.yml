@@ -18,12 +18,19 @@ services:
             dockerfile: ./docker/php/Dockerfile
             target: app
         entrypoint: [ "/bin/sh","-c" ]
-        #        command: [ "composer install && php-fpm" ]
-        command: [ "php-fpm" ]
+        command: [ "composer install && php-fpm" ]
         depends_on:
             - database
         volumes:
             - ./:/var/www/app
+
+    nodejs:
+        image: node:alpine
+        working_dir: /var/www/app
+        volumes:
+            - ./:/var/www/app
+        entrypoint: [ "/bin/sh","-c" ]
+        command: [ "npm i && npm run prod" ]
 
     database:
         image: mysql:8.0
