@@ -33,11 +33,10 @@
         }
     },
     "scripts": {
-        "init": [
+        "init-app": [
             "@composer install",
-            "@migrations"
+            "@php artisan migrate"
         ],
-        "migrations": "@php artisan migrate",
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

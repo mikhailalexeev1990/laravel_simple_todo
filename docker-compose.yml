@@ -18,7 +18,7 @@ services:
             dockerfile: ./docker/php/Dockerfile
             target: app
         entrypoint: [ "/bin/sh","-c" ]
-        command: [ "composer init && php-fpm" ]
+        command: [ "composer init-app && php-fpm" ]
         depends_on:
             - database
         volumes:
