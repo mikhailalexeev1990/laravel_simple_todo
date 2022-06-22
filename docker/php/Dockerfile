@@ -2,10 +2,10 @@
 FROM php:8.1.0-fpm-alpine AS php
 WORKDIR /var/www/app
 RUN set -eux \
-    && apk add --no-cache --virtual .pgsql-deps postgresql-dev \
-    && docker-php-ext-install -j$(nproc) pcntl pdo_pgsql \
-    && apk add --no-cache --virtual .pgsql-rundeps so:libpq.so.5 \
-    && apk del .pgsql-deps
+    && apk add --no-cache --virtual .mysql-deps mysql-dev \
+    && docker-php-ext-install -j$(nproc) pcntl pdo_mysql \
+    && apk add --no-cache --virtual .mysql-rundeps so:libpq.so.5 \
+    && apk del .mysql-deps
 
 ENTRYPOINT ["/bin/sh", "-c"]
 CMD ["php-fpm"]
