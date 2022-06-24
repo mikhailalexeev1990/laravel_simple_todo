@@ -2,16 +2,16 @@
     <form class="form" @submit.prevent="addTodo">
         <h1 class="title">Todo</h1>
         <div class="todo-container">
-            <ul v-if="todo.length" class="list">
-                <li v-for="item in todo">{{ item.todoValue }}</li>
-            </ul>
-            <h2 v-else class="empty-todo">Here you todo...</h2>
-            <Loader
-                :isLoading="loading"
+            <TodoList v-if="todo.length"
+                      :list="todo"
+                      class="list"
+                      @setTodoValue="setTodoValue"
             />
+            <h2 v-else class="empty-todo">Here you todo...</h2>
+            <Loader :isLoading="loading"/>
         </div>
         <label class="button-box">
-            <input ref="inputTodo" placeholder="Example: clean house">
+            <input v-model="todoValue" placeholder="Example: Clean house">
             <button>Add list</button>
         </label>
     </form>
@@ -20,15 +20,18 @@
 <script>
     import axios from "axios";
     import Loader from "./Loader.vue";
+    import TodoList from "./TodoList.vue";
 
     export default {
         components: {
-            Loader
+            Loader,
+            TodoList,
         },
         data() {
             return {
                 todo: [],
-                valueTodo: null,
+                todoValue: null,
+                parent: null,
                 loading: false,
             }
         },
@@ -45,27 +48,34 @@
                 })
             },
             addTodo() {
-                const inputTodo = this.$refs['inputTodo'];
-                const todoValue = inputTodo.value;
+                const {todoValue, parent = null} = this;
+                const parentId = parent?.id ?? null;
 
                 if (todoValue) {
                     this.loading = true;
-                    axios.post('/api/v1/todo', {
-                        todoValue,
-                    }).then((res) => {
-                        this.todo.push({todoValue})
-                        inputTodo.value = null;
-                        inputTodo.focus();
+                    axios.post('/api/v1/todo', {todoValue, parentId}).then((res) => {
+                        const todoData = res.data;
+                        todoData.children = [];
+
+                        (parent === null)
+                            ? this.todo.push(todoData)
+                            : parent.children.push(todoData);
+
+                        this.setTodoValue(null, null);
                     }).finally(() => {
                         this.loading = false;
                     })
                 }
-            }
+            },
+            setTodoValue(todoValue, parent) {
+                this.todoValue = todoValue;
+                this.parent = parent;
+            },
         }
     }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
     .form {
         max-width: 400px;
         margin: 50px auto;
@@ -90,6 +100,7 @@
         }
 
         .list {
+            width: 100%;
             list-style-type: decimal;
         }
 
@@ -101,6 +112,8 @@
 
         .button-box {
             display: flex;
+            margin-top: 10px;
+            margin-bottom: 20px;
             text-align: center;
 
             input {

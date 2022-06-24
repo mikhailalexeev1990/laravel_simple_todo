@@ -1,6 +1,6 @@
 <template>
-    <div class="loader-wrapper">
-        <svg v-if="loading" preserveAspectRatio="xMidYMid" style="margin: auto; background: none; display: block; shape-rendering: auto;"
+    <div class="loader-wrapper" v-if="loading">
+        <svg preserveAspectRatio="xMidYMid" style="margin: auto; background: none; display: block; shape-rendering: auto;"
              viewBox="0 0 100 100"
              xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
             <circle cx="50" cy="50" fill="none" r="31" stroke="#239dbf" stroke-dasharray="84.82300164692441 30.274333882308138"

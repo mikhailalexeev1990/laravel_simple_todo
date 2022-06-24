@@ -12,7 +12,7 @@ class TodoController extends BaseController
     public function getTodo(): Response
     {
         return new Response([
-            'todo' => Todo::all(),
+            'todo' => Todo::where(['parent_id' => null])->with('children')->get(),
         ]);
     }
 
@@ -21,15 +21,14 @@ class TodoController extends BaseController
     {
         $validated = $request->validate([
             'todoValue' => 'required|max:255',
+            'parentId' => 'present|nullable|integer|min:1|exists:todos,id',
         ]);
 
         $todo = new Todo;
         $todo->todoValue = $validated['todoValue'];
+        $todo->parentId = $validated['parentId'];
         $todo->save();
 
-        return new Response([
-            'success' => true,
-            '$todo' => $todo,
-        ]);
+        return new Response($todo);
     }
 }
